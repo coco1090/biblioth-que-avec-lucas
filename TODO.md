@@ -1,0 +1,2 @@
+- [x] Remove 'novalidate' attribute from form in admin/livre_add.php
+- [x] Remove 'novalidate' attribute from form in admin/livre_edit.php

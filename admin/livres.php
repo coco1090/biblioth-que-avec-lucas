@@ -32,9 +32,23 @@ include __DIR__ . "/../includes/nav.php";
                 <h1 class="text-4xl font-bold text-gray-800 mb-2">
                     Gestion des livres
                 </h1>
+ 
+                <?php
+                if(count($livres) > 1):
+                ?>
                 <p class="text-gray-600">
+                    Total : <?= count($livres) ?> livres
+                </p> 
+                <?php
+                else :
+                    ?>
+                    <p class="text-gray-600">
                     Total : <?= count($livres) ?> livre
-                </p>
+                </p> 
+                <?php   
+endif;
+                ?>
+                
             </div>
 
             <!-- Bouton pour ajouter un nouveau livre -->

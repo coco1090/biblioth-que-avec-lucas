@@ -33,7 +33,7 @@ foreach ($livres as $livre) {
     }
 }
 
-$_SESSION['message_modification'] = "Le livre '{$livre['titre']}' de {$livre['auteur']} a été supprimé avec succès.";
+$_SESSION['message_modification'] = "Le livre '{$livre['titre']}' de {$livre['auteur']} a été modifié avec succès.";
 
 $sql = "SELECT l.id_livre, l.auteur, l.titre, l.couverture, CASE WHEN e.id_emprunt IS NOT NULL THEN 'emprunté' ELSE 'disponible' END AS statut, CONCAT(a.nom, ' ', a.prenom) AS emprunteur FROM livre l LEFT JOIN emprunt e ON l.id_livre = e.id_livre AND e.date_rendu IS NULL LEFT JOIN abonne a ON e.id_abonne = a.id_abonne;";
 
@@ -88,7 +88,7 @@ include __DIR__ . "/../includes/nav.php";
                 endif; ?>
 
                 <!-- Formulaire -->
-                <form method="POST" action="" novalidate>
+                <form method="POST" action="">
                     <!-- Champ Titre -->
                     <div class="mb-6">
                         <label for="titre" class="block text-gray-700 font-semibold mb-2">
@@ -123,6 +123,7 @@ include __DIR__ . "/../includes/nav.php";
                             name="auteur"
                             required
                             maxlength="25"
+                            
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -145,6 +146,7 @@ include __DIR__ . "/../includes/nav.php";
                             id="couverture"
                             name="couverture"
                             maxlength="100"
+                            pattern=".*\.(jpe?g|JPE?G|png|PNG|webp|WEBP|gif|GIF)$"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -154,7 +156,7 @@ include __DIR__ . "/../includes/nav.php";
                             ?>"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Ex: images/couvertures/les_miserables.jpg">
-                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture</p>
+                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture (extension d'image) </p>
                     </div>
 
                     <!-- Légende des champs obligatoires -->

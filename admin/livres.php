@@ -32,9 +32,16 @@ include __DIR__ . "/../includes/nav.php";
                 <h1 class="text-4xl font-bold text-gray-800 mb-2">
                     Gestion des livres
                 </h1>
+                
+                <?php if (count($livres) < 2) : ?>
                 <p class="text-gray-600">
                     Total : <?= count($livres) ?> livre
                 </p>
+                <?php else : ?> 
+                <p class="text-gray-600">
+                    Total : <?= count($livres) ?> livres
+                </p>
+                <?php endif; ?>
             </div>
 
             <!-- Bouton pour ajouter un nouveau livre -->
@@ -42,6 +49,22 @@ include __DIR__ . "/../includes/nav.php";
                 ➕ Ajouter un livre
             </a>
         </header>
+
+        <?php if (isset($_SESSION['message_suppression'])): ?>
+            <div class="mb-6 bg-red-100 border-l-4 border-red-600 text-red-700 p-4 rounded">
+                <p class="font-bold">Suppression réussie</p>
+                <p><?= htmlspecialchars($_SESSION['message_suppression']); ?></p>
+            </div>
+            <?php unset($_SESSION['message_suppression']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['message_modification'])): ?>
+            <div class="mb-6 bg-green-100 border-l-4 border-green-600 text-green-700 p-4 rounded">
+                <p class="font-bold">modification réussie</p>
+                <p><?= htmlspecialchars($_SESSION['message_modification']); ?></p>
+            </div>
+            <?php unset($_SESSION['message_modification']); ?>
+        <?php endif; ?>
 
         <!-- Section de la liste des livres -->
         <section aria-label="Liste des livres">
@@ -57,7 +80,6 @@ include __DIR__ . "/../includes/nav.php";
             <!-- Tableau des livres -->
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <?php foreach($livres as $livre) : ?>
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -80,6 +102,7 @@ include __DIR__ . "/../includes/nav.php";
                             </th>
                         </tr>
                     </thead>
+                    <?php foreach($livres as $livre) : ?>
                     <tbody class="bg-white divide-y divide-gray-200">
 
                         <tr class="hover:bg-gray-50">
@@ -114,25 +137,30 @@ include __DIR__ . "/../includes/nav.php";
                                 <?php endif; ?>
                             </td>
 
-                           
+                            <!-- Abonné ayant emprunté le livre -->
+                            <td class="px-6 py-4 text-sm text-center text-gray-500">
+                                <?= $livre['emprunteur']; ?>
+                            </td>
 
-<td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-    <!-- Bouton modifier -->
-    <a href="livre_edit.php?id=<?= $livre['id_livre']; ?>"
-        class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition font-medium">
-        ✏️ Modifier
-    </a>
-    <?php if ($livre['statut'] === "disponible") : ?>
-        <!-- Bouton supprimer - CORRECTION ICI -->
-        <a href="livre_delete.php?id=<?= $livre['id_livre']; ?>"
-            class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition font-medium"
-            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?');">
-            🗑️ Supprimer
-        </a>
-    <?php endif; ?>
-</td>
-                        
-                            
+                            <!-- Actions -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                                <!-- Bouton modifier -->
+                                <a href="livre_edit.php?id_livre=<?= $livre['id_livre']; ?>"
+                                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition font-medium">
+                                    ✏️ Modifier
+                                </a>
+
+                                <?php if ($livre['statut'] === "disponible") : ?>
+                                <!-- Bouton supprimer -->
+                                <a href="livre_delete.php?id=<?= $livre['id_livre']; ?>"
+                                    class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition font-medium"
+                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?');">
+                                    🗑️ Supprimer
+                                </a>
+
+                            </td>
+                            <?php endif; ?>
+                        </tr>
 
                     </tbody>
                     <?php endforeach;   ?>

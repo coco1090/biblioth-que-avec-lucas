@@ -12,6 +12,29 @@ require_once __DIR__ . "/../config/database.php";
 
 $pdo = get_db_connection();
 
+$sql_modif = "SELECT l.id_livre, l.auteur, l.titre, l.couverture, CASE WHEN e.id_emprunt IS NOT NULL THEN 'emprunté' ELSE 'disponible' END AS statut, CONCAT(a.nom, ' ', a.prenom) AS emprunteur FROM livre l LEFT JOIN emprunt e ON l.id_livre = e.id_livre AND e.date_rendu IS NULL LEFT JOIN abonne a ON e.id_abonne = a.id_abonne;";
+
+$reqPrepare = $pdo->prepare($sql_modif);
+$reqPrepare->execute();
+
+$livres = $reqPrepare->fetchALL();
+
+foreach ($livres as $livre) {
+    if ($livre['id_livre'] == $_GET["id_livre"]) {
+        $titre = $livre['titre'];
+        break;
+    }
+}
+
+foreach ($livres as $livre) {
+    if ($livre['id_livre'] == $_GET["id_livre"]) {
+        $auteur = $livre['auteur'];
+        break;
+    }
+}
+
+$_SESSION['message_modification'] = "Le livre '{$livre['titre']}' de {$livre['auteur']} a été modifié avec succès.";
+
 $sql = "SELECT l.id_livre, l.auteur, l.titre, l.couverture, CASE WHEN e.id_emprunt IS NOT NULL THEN 'emprunté' ELSE 'disponible' END AS statut, CONCAT(a.nom, ' ', a.prenom) AS emprunteur FROM livre l LEFT JOIN emprunt e ON l.id_livre = e.id_livre AND e.date_rendu IS NULL LEFT JOIN abonne a ON e.id_abonne = a.id_abonne;";
 
 $reqPrepare = $pdo->prepare($sql);
@@ -20,6 +43,34 @@ $reqPrepare->execute();
 $livres = $reqPrepare->fetchALL();
 
 $ids = array_column($livres, 'id_livre'); // récupère tous les id_livre
+
+function traiterFormulaire($titre, $auteur, $couverture = "") {
+    $pdo = get_db_connection();
+    $update = "UPDATE livre SET titre = :titre, auteur = :auteur, couverture = :couverture WHERE id_livre = :id_livre";
+    $requpdate = $pdo->prepare($update);
+    $requpdate->execute([
+        ':titre' => $titre,
+        ':auteur' => $auteur,
+        ':couverture' => $couverture,
+        ':id_livre' => $_GET['id_livre']
+    ]);
+    header("Location: livres.php");
+    exit();
+}
+
+$char_lim_titre = 30;
+$char_lim_auteur = 25;
+$char_lim_couverture = 100;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (iconv_strlen($_POST['titre']) > $char_lim_titre || iconv_strlen($_POST['auteur']) > $char_lim_auteur || iconv_strlen($_POST['couverture']) > $char_lim_couverture) {
+        $_SESSION['message_modification'] = "Erreur : Les champs dépassent la limite de caractères autorisée.";
+        header("Location: livres.php");
+        exit();
+    }
+    else
+        traiterFormulaire(htmlspecialchars($_POST['titre']), htmlspecialchars($_POST['auteur']), htmlspecialchars($_POST['couverture']));
+}
 
 include __DIR__ . "/../includes/header.php";
 include __DIR__ . "/../includes/nav.php";
@@ -57,7 +108,7 @@ include __DIR__ . "/../includes/nav.php";
                             id="titre"
                             name="titre"
                             required
-                            maxlength="30"
+                            maxlength="<?= $char_lim_titre; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -80,7 +131,7 @@ include __DIR__ . "/../includes/nav.php";
                             id="auteur"
                             name="auteur"
                             required
-                            maxlength="25"
+                            maxlength="<?= $char_lim_auteur; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -102,7 +153,7 @@ include __DIR__ . "/../includes/nav.php";
                             type="text"
                             id="couverture"
                             name="couverture"
-                            maxlength="100"
+                            maxlength="<?= $char_lim_couverture; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {

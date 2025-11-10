@@ -12,6 +12,29 @@ require_once __DIR__ . "/../config/database.php";
 
 $pdo = get_db_connection();
 
+$sql_modif = "SELECT l.id_livre, l.auteur, l.titre, l.couverture, CASE WHEN e.id_emprunt IS NOT NULL THEN 'emprunté' ELSE 'disponible' END AS statut, CONCAT(a.nom, ' ', a.prenom) AS emprunteur FROM livre l LEFT JOIN emprunt e ON l.id_livre = e.id_livre AND e.date_rendu IS NULL LEFT JOIN abonne a ON e.id_abonne = a.id_abonne;";
+
+$reqPrepare = $pdo->prepare($sql_modif);
+$reqPrepare->execute();
+
+$livres = $reqPrepare->fetchALL();
+
+foreach ($livres as $livre) {
+    if ($livre['id_livre'] == $_GET["id_livre"]) {
+        $titre = $livre['titre'];
+        break;
+    }
+}
+
+foreach ($livres as $livre) {
+    if ($livre['id_livre'] == $_GET["id_livre"]) {
+        $auteur = $livre['auteur'];
+        break;
+    }
+}
+
+$_SESSION['message_modification'] = "Le livre '{$livre['titre']}' de {$livre['auteur']} a été supprimé avec succès.";
+
 $sql = "SELECT l.id_livre, l.auteur, l.titre, l.couverture, CASE WHEN e.id_emprunt IS NOT NULL THEN 'emprunté' ELSE 'disponible' END AS statut, CONCAT(a.nom, ' ', a.prenom) AS emprunteur FROM livre l LEFT JOIN emprunt e ON l.id_livre = e.id_livre AND e.date_rendu IS NULL LEFT JOIN abonne a ON e.id_abonne = a.id_abonne;";
 
 $reqPrepare = $pdo->prepare($sql);
@@ -20,6 +43,25 @@ $reqPrepare->execute();
 $livres = $reqPrepare->fetchALL();
 
 $ids = array_column($livres, 'id_livre'); // récupère tous les id_livre
+
+function traiterFormulaire($titre, $auteur, $couverture = "") {
+    $pdo = get_db_connection();
+    $update = "UPDATE livre SET titre = :titre, auteur = :auteur, couverture = :couverture WHERE id_livre = :id_livre";
+    $requpdate = $pdo->prepare($update);
+    $requpdate->execute([
+        ':titre' => $titre,
+        ':auteur' => $auteur,
+        ':couverture' => $couverture,
+        ':id_livre' => $_GET['id_livre']
+    ]);
+    header("Location: livres.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    traiterFormulaire(htmlspecialchars($_POST['titre']), htmlspecialchars($_POST['auteur']), htmlspecialchars($_POST['couverture']));
+}
 
 include __DIR__ . "/../includes/header.php";
 include __DIR__ . "/../includes/nav.php";

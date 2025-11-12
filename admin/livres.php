@@ -32,23 +32,16 @@ include __DIR__ . "/../includes/nav.php";
                 <h1 class="text-4xl font-bold text-gray-800 mb-2">
                     Gestion des livres
                 </h1>
- 
-                <?php
-                if(count($livres) > 1):
-                ?>
+                
+                <?php if (count($livres) < 2) : ?>
+                <p class="text-gray-600">
+                    Total : <?= count($livres) ?> livre
+                </p>
+                <?php else : ?> 
                 <p class="text-gray-600">
                     Total : <?= count($livres) ?> livres
-                </p> 
-                <?php
-                else :
-                    ?>
-                    <p class="text-gray-600">
-                    Total : <?= count($livres) ?> livre
-                </p> 
-                <?php   
-endif;
-                ?>
-                
+                </p>
+                <?php endif; ?>
             </div>
 
             <!-- Bouton pour ajouter un nouveau livre -->
@@ -66,7 +59,7 @@ endif;
         <?php endif; ?>
 
         <?php if (isset($_SESSION['message_modification'])): ?>
-            <div class="mb-6 bg-greeen-100 border-l-4 border-green-600 text-green-700 p-4 rounded">
+            <div class="mb-6 bg-green-100 border-l-4 border-green-600 text-green-700 p-4 rounded">
                 <p class="font-bold">modification réussie</p>
                 <p><?= htmlspecialchars($_SESSION['message_modification']); ?></p>
             </div>

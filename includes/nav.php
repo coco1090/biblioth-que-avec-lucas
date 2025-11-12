@@ -35,19 +35,30 @@
                         </span>
                     </li>
                     <li>
-                        <!-- Bouton de déconnexion -->
                         <a href="/bibliotheque/logout.php" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition font-medium">
                             Déconnexion
                         </a>
                     </li>
-                    <!-- Lien visible uniquement pour les visiteurs non connectés -->
-                    <?php else: ?>
+
+                <?php elseif (isset($_SESSION['abonne_id'])): ?>
                     <li>
-                        <a href="/bibliotheque/login.php" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition font-medium">
-                            Connexion Admin
+                        <span class="text-blue-200">
+                            Bonjour, <?= htmlspecialchars($_SESSION['abonne_prenom'] ?? 'Abonné'); ?>
+                        </span>
+                    </li>
+                    <li>
+                        <a href="/bibliotheque/logout.php" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition font-medium">
+                            Déconnexion
                         </a>
                     </li>
-                    <?php endif; ?>
+
+                <?php else: ?>
+                    <li>
+                        <a href="/bibliotheque/login.php" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition font-medium">
+                            Connexion
+                        </a>
+                    </li>
+                <?php endif; ?>
                 </ul>
             </div>
         </div>

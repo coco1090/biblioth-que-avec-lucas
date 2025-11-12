@@ -17,8 +17,8 @@ require_once __DIR__ . "/config/database.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
     {
-        $login = $_POST['login'] ?? '';
-        $password = $_POST['password'] ?? '';
+        $login = htmlspecialchars($_POST['login'] ?? '');
+        $password = htmlspecialchars($_POST['password'] ?? '');
         
         if (!filter_var($login, FILTER_VALIDATE_EMAIL))
             {
@@ -35,13 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 
                 $sql_admin = "SELECT * FROM administrateur WHERE email = :login LIMIT 1;";
 
-                $log = $pdo->prepare($sql_admin);
-                $log->bindParam(':login', $login, PDO::PARAM_STR);
-                $log->execute();
+                $log_adm = $pdo->prepare($sql_admin);
+                $log_adm->bindParam(':login', $login, PDO::PARAM_STR);
+                $log_adm->execute();
+
+                $sql_abo = "SELECT * FROM abonne WHERE email = :login LIMIT 1;";
+
+                $log_abo = $pdo->prepare($sql_abo);
+                $log_abo->bindParam(':login', $login, PDO::PARAM_STR);
+                $log_abo->execute();
                 
-                if ($log->rowCount() === 1)
+                if ($log_adm->rowCount() === 1)
                 {
-                    $admin = $log->fetch(PDO::FETCH_ASSOC);
+                    $admin = $log_adm->fetch(PDO::FETCH_ASSOC);
                     if (password_verify($password, $admin['mot_de_passe']))
                         {
                             $_SESSION['admin_id'] = $admin['id_admin'];
@@ -65,6 +71,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
                             $error .= '<p>Mot de passe ou identifiant incorrect</p>';
                         }
                 }
+                else if ($log_abo->rowCount() === 1)
+                    {
+                        $abo = $log_abo->fetch(PDO::FETCH_ASSOC);
+                        if (password_verify($password, $abo['mot_de_passe']))
+                        {
+                            $_SESSION['abonne_id'] = $abo['id_abonne'];
+                            $_SESSION['abonne_nom'] = $abo['nom'];
+                            $_SESSION['abonne_prenom'] = $abo['prenom'];
+                            $_SESSION['abonne_email'] = $abo['email'];
+
+                            $_SESSION['message'] = "Bienvenue " . htmlspecialchars($abo['prenom']);
+
+                             header('Location: index.php');
+                            exit();
+                        }
+                        else
+                        {
+                            $error .= '<p>Mot de passe ou identifiant incorrect</p>';
+                        }
+                    }
                 else
                     {
                         $error .= '<p>Mot de passe ou identifiant incorrect</p>';
@@ -84,11 +110,8 @@ include __DIR__ . "/includes/nav.php";
             <!-- Titre de la page -->
             <header class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-gray-800 mb-2">
-                    Connexion Administrateur
+                    Connexion à la bibliotheque
                 </h1>
-                <p class="text-gray-600">
-                    Connectez-vous pour accéder à l'interface d'administration
-                </p>
             </header>
 
             <!-- Formulaire de connexion -->
@@ -102,7 +125,7 @@ include __DIR__ . "/includes/nav.php";
                 <?php endif; ?>
 
                 <!-- Formulaire -->
-                <form method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" novalidate>
+                <form method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                     <!-- Champ Login -->
                     <div class="mb-6">
                         <label for="login" class="block text-gray-700 font-semibold mb-2">
@@ -141,6 +164,13 @@ include __DIR__ . "/includes/nav.php";
                         Se connecter
                     </button>
                 </form>
+
+                <!-- Lien inscription -->
+                <div class="mt-6 text-center">pas encore de compte ? alors
+                    <a href="/bibliotheque/inscription.php" class="text-blue-600 hover:text-blue-800 transition">
+                        inscrivez-vous !
+                    </a>
+                </div>
 
                 <!-- Lien de retour -->
                 <div class="mt-6 text-center">

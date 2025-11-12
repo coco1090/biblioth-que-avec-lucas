@@ -58,9 +58,18 @@ function traiterFormulaire($titre, $auteur, $couverture = "") {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$char_lim_titre = 30;
+$char_lim_auteur = 25;
+$char_lim_couverture = 100;
 
-    traiterFormulaire(htmlspecialchars($_POST['titre']), htmlspecialchars($_POST['auteur']), htmlspecialchars($_POST['couverture']));
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (iconv_strlen($_POST['titre']) > $char_lim_titre || iconv_strlen($_POST['auteur']) > $char_lim_auteur || iconv_strlen($_POST['couverture']) > $char_lim_couverture) {
+        $_SESSION['message_modification'] = "Erreur : Les champs dépassent la limite de caractères autorisée.";
+        header("Location: livres.php");
+        exit();
+    }
+    else
+        traiterFormulaire(htmlspecialchars($_POST['titre']), htmlspecialchars($_POST['auteur']), htmlspecialchars($_POST['couverture']));
 }
 
 include __DIR__ . "/../includes/header.php";
@@ -88,7 +97,7 @@ include __DIR__ . "/../includes/nav.php";
                 endif; ?>
 
                 <!-- Formulaire -->
-                <form method="POST" action="">
+                <form method="POST" action="" novalidate>
                     <!-- Champ Titre -->
                     <div class="mb-6">
                         <label for="titre" class="block text-gray-700 font-semibold mb-2">
@@ -99,7 +108,7 @@ include __DIR__ . "/../includes/nav.php";
                             id="titre"
                             name="titre"
                             required
-                            maxlength="30"
+                            maxlength="<?= $char_lim_titre; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -122,8 +131,7 @@ include __DIR__ . "/../includes/nav.php";
                             id="auteur"
                             name="auteur"
                             required
-                            maxlength="25"
-                            
+                            maxlength="<?= $char_lim_auteur; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -145,8 +153,7 @@ include __DIR__ . "/../includes/nav.php";
                             type="text"
                             id="couverture"
                             name="couverture"
-                            maxlength="100"
-                            pattern=".*\.(jpe?g|JPE?G|png|PNG|webp|WEBP|gif|GIF)$"
+                            maxlength="<?= $char_lim_couverture; ?>"
                             value="<?php
                             foreach ($livres as $livre) {
                                 if ($livre['id_livre' ] == $_GET['id_livre']) {
@@ -156,7 +163,7 @@ include __DIR__ . "/../includes/nav.php";
                             ?>"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Ex: images/couvertures/les_miserables.jpg">
-                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture (extension d'image) </p>
+                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture</p>
                     </div>
 
                     <!-- Légende des champs obligatoires -->

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once __DIR__ . "/config/database.php";
 
 $page_title = "accueil - Bibliothèque";
@@ -13,6 +15,28 @@ $reqPrepare->execute();
 
 $livres = $reqPrepare->fetchALL();
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['abonne_id'])) {
+    $id_livre = $_POST['id_livre'] ?? null;
+    if ($id_livre) {
+        foreach ($livres as $livre) {
+            if ($livre['id_livre'] == $id_livre)
+            {
+                $titre = $livre['titre'];
+                $auteur = $livre['auteur'];
+            }
+        }
+        $sql_emprunt = "INSERT INTO emprunt (id_abonne, id_livre, date_sortie) VALUES (:id_abonne, :id_livre, NOW());";
+        $req_emprunt = $pdo->prepare($sql_emprunt);
+        $req_emprunt->execute([
+            ':id_abonne' => $_SESSION['abonne_id'],
+            ':id_livre' => $id_livre
+        ]);
+        $_SESSION['emprunt'] = "le livre $titre de $auteur a été emprunté avec succès.";
+        header("Location: index.php");
+        exit();
+    }
+}
+
 include __DIR__ . "/includes/header.php";
 include __DIR__ . "/includes/nav.php";
 ?>
@@ -23,10 +47,16 @@ include __DIR__ . "/includes/nav.php";
         <!-- Titre de la page -->
         <header class="mb-8">
             <?php if (isset($_GET['logout']) && $_GET['logout'] === "success") : ?>
-            <div role="alert">
+            <div class="mb-6 bg-red-100 border-l-4 border-red-600 text-red-700 p-4 rounded">
                 <p>déconnexion réussite</p>
             </div>
             <?php endif; ?>
+            <?php if (isset($_SESSION['emprunt'])) : ?>
+            <div class="mb-6 bg-green-100 border-l-4 border-green-600 text-green-700 p-4 rounded">
+                <p><?= $_SESSION['emprunt'] ?></p>
+            </div>
+            <?php endif;?>
+            <?php unset($_SESSION['emprunt']); ?>
             <h1 class="text-4xl font-bold text-gray-800 mb-2">
                 Catalogue de la Bibliothèque
             </h1>
@@ -95,6 +125,25 @@ include __DIR__ . "/includes/nav.php";
                         <p class="text-gray-500 text-sm">
                             Référence : <?= $livre['id_livre']; ?>
                         </p>
+
+                        <!-- Bouton d'emprunt -->
+                        <?php if($livre['statut'] === 'disponible' && isset($_SESSION['abonne_id'])): ?>
+                        <form method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                            <button type="submit" name="id_livre" value="<?= $livre['id_livre']; ?>" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+                                Emprunter
+                            </button>
+                        </form>
+                        <?php elseif($livre['statut'] === 'disponible' && isset($_SESSION['admin_id'])): ?>
+                        <form method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                            <button type="submit" name="id_livre" value="<?= $livre['id_livre']; ?>" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition" disabled>
+                                Emprunter
+                            </button>
+                        </form>
+                        <?php else: ?>
+                        <button class="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                            Indisponible
+                        </button>
+                        <?php endif; ?>
                     </div>
                 </article>
                 <?php endforeach; ?>

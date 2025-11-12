@@ -86,11 +86,10 @@ include __DIR__ . "/../includes/nav.php";
                             id="couverture"
                             name="couverture"
                             maxlength="100"
-                            pattern=".*\.(jpe?g|JPE?G|png|PNG|webp|WEBP|gif|GIF)$"
                             value=""
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Ex: images/couvertures/les_miserables.jpg">
-                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture (extension d'image) </p>
+                        <p class="text-gray-500 text-sm mt-1">Optionnel - Chemin relatif vers l'image de couverture</p>
                     </div>
 
                     <!-- Légende des champs obligatoires -->

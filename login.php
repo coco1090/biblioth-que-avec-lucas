@@ -14,6 +14,12 @@ $password = '';
 
 require_once __DIR__ . "/config/database.php";
 
+if (isset($_SESSION["abonne_id"]))
+{
+    header('Location: index.php');
+    exit();
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
     {
@@ -113,6 +119,11 @@ include __DIR__ . "/includes/nav.php";
                     Connexion à la bibliotheque
                 </h1>
             </header>
+            <?php if (isset($_GET['inscription']) && $_GET['inscription'] === "success") : ?>
+                <div class="mb-6 bg-green-100 border-l-4 border-green-600 text-green-700 p-4 rounded">
+                <p>inscription réussie ! vous pouvez maintenant vous connecter.</p>
+            </div>
+            <?php endif; ?>
 
             <!-- Formulaire de connexion -->
             <section class="bg-white rounded-lg shadow-md p-8">

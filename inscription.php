@@ -8,6 +8,12 @@ if (isset($_SESSION["admin_id"]))
         exit();
     }
 
+if (isset($_SESSION["abonne_id"]))
+{
+    header('Location: index.php');
+    exit();
+}
+
 $error = '';
 $login = '';
 $password = '';
@@ -71,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
                     ':email' => $login,
                     ':mot_de_passe' => $hashed_password
                 ]);
-                header("Location: login.php");
+                header("Location: login.php?inscription=success");
                 exit;
         }
     }
@@ -145,6 +151,10 @@ include __DIR__ . "/includes/nav.php";
                         <label class="block text-gray-700 font-semibold mb-2">
                             <input type="radio" name="civilite" value="Mme">
                             Mme
+                        </label>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <input type="radio" name="civilite" value="autre">
+                            autre
                         </label>
                     </div>
 

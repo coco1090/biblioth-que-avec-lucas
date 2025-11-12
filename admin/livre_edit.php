@@ -63,7 +63,7 @@ $char_lim_auteur = 25;
 $char_lim_couverture = 100;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (iconv_strlen($_POST['titre']) > $char_lim_titre || iconv_strlen($_POST['auteur']) > $char_lim_auteur || iconv_strlen($_POST['couverture']) > $char_lim_couverture) {
+    if (iconv_strlen(htmlspecialchars($_POST['titre'])) > $char_lim_titre || iconv_strlen(htmlspecialchars($_POST['auteur'])) > $char_lim_auteur || iconv_strlen(htmlspecialchars($_POST['couverture'])) > $char_lim_couverture) {
         $_SESSION['message_modification'] = "Erreur : Les champs dépassent la limite de caractères autorisée.";
         header("Location: livres.php");
         exit();

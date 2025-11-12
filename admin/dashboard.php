@@ -131,7 +131,7 @@ include __DIR__ . "/../includes/nav.php";
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="?voir_historique=true&id_abonne=<?= $abonne['id_abonne'] ?>" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    <a href="?voir_historique=true&id_abonne=<?= $abonne['id_abonne'] ?>#section1" class="text-blue-600 hover:text-blue-800 font-medium">
                                         Voir historique
                                     </a>
                                 </td>
@@ -185,7 +185,7 @@ include __DIR__ . "/../includes/nav.php";
         <section class="mt-8 bg-blue-50 rounded-lg p-6">
             <header class="mb-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Historique des emprunts</h2>
+                    <h2 class="text-2xl font-bold text-gray-800" id="section1">Historique des emprunts</h2>
                     <?php if ($abonne_info) : ?>
                         <p class="text-gray-600 mt-1">
                             <?= htmlspecialchars($abonne_info['civilite'] . ' ' . $abonne_info['prenom'] . ' ' . $abonne_info['nom'] . ' (' . $abonne_info['email'] . ')'); ?>

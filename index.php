@@ -16,7 +16,7 @@ $reqPrepare->execute();
 $livres = $reqPrepare->fetchALL();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['abonne_id'])) {
-    $id_livre = $_POST['id_livre'] ?? null;
+    $id_livre = htmlspecialchars($_POST['id_livre']) ?? null;
     if ($id_livre) {
         foreach ($livres as $livre) {
             if ($livre['id_livre'] == $id_livre)
